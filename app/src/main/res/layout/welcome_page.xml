@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/Welcome_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/instrument_sans_bold"
+        android:text="Bienvenido a "
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="48sp" />
+
+    <TextView
+        android:id="@+id/MercaApp_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/instrument_sans_bold"
+        android:text="MercaApp"
+        android:textAlignment="center"
+        android:textColor="@color/greem"
+        android:textSize="48sp" />
+
+    <TextView
+        android:id="@+id/description_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:fontFamily="@font/instrument_sans"
+        android:text="Aquí podrás crear tus listas de mercado, tener unventario y mucho más!"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/button"
+        style="@android:style/Widget.Button"
+        android:layout_width="290dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/greem"
+        android:capitalize="none"
+        android:fontFamily="@font/instrument_sans"
+        android:text="Continuar"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+</LinearLayout>
