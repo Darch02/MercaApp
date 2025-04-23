@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
@@ -23,7 +25,9 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -40,11 +44,12 @@ import com.example.mercaapp.ui.theme.MercaAppTheme
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextDecoration
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -177,7 +182,6 @@ fun ListsView(modifier: Modifier = Modifier){
                         textAlign = TextAlign.Center,
                         fontSize = 40.sp
                     ),
-                    color = MaterialTheme.colorScheme.primary,
                     modifier = modifier.fillMaxWidth().padding(vertical = 24.dp)
                     )
                 listCard()
@@ -186,7 +190,7 @@ fun ListsView(modifier: Modifier = Modifier){
                 ExtendedFloatingActionButton(
                     onClick = {  },
                     icon = { Icon(Icons.Filled.Edit, "Extended floating action button.") },
-                    text = { Text(text = "Nueva lista") },
+                    text = { Text(text = "Nueva lista" , style = MaterialTheme.typography.labelSmall) },
                     modifier = modifier.padding(vertical = 24.dp)
                 )
             }
@@ -229,6 +233,76 @@ fun BottomNavigationBar(modifier: Modifier = Modifier) {
         )
     }
 }
+
+@Composable
+fun ListDetailView(modifier: Modifier = Modifier){
+    val initialTasks = listOf("Comprar pan", "Lavar el coche", "Escribir un correo", "Hacer ejercicio")
+    val tasks = remember { mutableStateListOf(*initialTasks.toTypedArray()) }
+    val taskStates = remember { mutableStateMapOf<String, Boolean>().apply { initialTasks.forEach { this[it] = false } } }
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar()
+        },
+        content = { paddingValues ->
+            Column(
+                modifier = modifier.padding(paddingValues)
+                    .padding(horizontal = 20.dp, vertical = 24.dp)
+
+            )
+            {
+                Text(
+                    text = "Nombre lista",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        textAlign = TextAlign.Center,
+                        fontSize = 40.sp
+                    )
+                )
+                tasks.forEach { task ->
+                    TachableListItem(
+                        text = task,
+                        isDone = taskStates[task] ?: false,
+                        onToggle = { isChecked -> taskStates[task] = isChecked }
+                    )
+                }
+                SmallFloatingActionButton (
+                    onClick = { /* Acción al hacer clic */ }){
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        modifier = modifier.padding(horizontal = 10.dp)) {
+                        Icon(Icons.Filled.Add, "Agregar")
+                        Text("Agregar", style = MaterialTheme.typography.labelSmall)
+                    }
+
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun TachableListItem(text: String, isDone: Boolean, onToggle: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onToggle(!isDone) }
+            .padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Checkbox(
+            checked = isDone,
+            onCheckedChange = onToggle
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                textDecoration = if (isDone) TextDecoration.LineThrough else TextDecoration.None,
+                fontSize = 20.sp
+            ),
+            color = if (isDone) Color.Gray else Color.Black,
+            modifier = Modifier.weight(1f) // Para que el texto ocupe la mayor parte del espacio
+        )
+    }
+}
 @Preview(showBackground = true)
 @Composable
 fun MyAppPreview() {
@@ -249,5 +323,12 @@ fun LoginScreenPreview() {
 fun listsViewPreview() {
     MercaAppTheme(dynamicColor = false) {
         ListsView()
+    }
+}
+@Preview(showBackground = true)
+@Composable
+fun ListsDetailViewPreview() {
+    MercaAppTheme(dynamicColor = false) {
+        ListDetailView()
     }
 }
