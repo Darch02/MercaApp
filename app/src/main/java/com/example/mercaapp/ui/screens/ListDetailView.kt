@@ -5,15 +5,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -21,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mercaapp.ui.components.TachableListItem
 import com.example.mercaapp.ui.components.BottomNavigationBar
+import com.example.mercaapp.ui.components.TextInput
 
 @Composable
 fun ListDetailView(modifier: Modifier = Modifier){
@@ -61,6 +67,42 @@ fun ListDetailView(modifier: Modifier = Modifier){
                     }
 
                 }
+            }
+        }
+    )
+}
+
+@Composable
+fun PopUpwNeListItem(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier)
+{
+    var nombre by remember { mutableStateOf("") }
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        title = { Text("Nueva lista") },
+        text = {
+            Column {
+                TextInput(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    name = "nombre",
+                    modifier = modifier
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                println("Nombre ingresado: $nombre")
+            }) {
+                Text("Guardar")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancelar")
             }
         }
     )
