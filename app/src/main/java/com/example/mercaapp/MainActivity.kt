@@ -113,3 +113,19 @@ fun ListsDetailViewPreview() {
         ListDetailView()
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun RegisterScreenPreview(){
+    MercaAppTheme(dynamicColor = false) {
+        RegisterScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ForgotPasswordScreenPreview(){
+    MercaAppTheme(dynamicColor = false) {
+        ForgotPasswordScreen()
+    }
+}
