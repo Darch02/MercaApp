@@ -139,3 +139,23 @@ fun ProfilePreview(){
         ProfileScreen()
     }
 }
+
+
+@Preview(showBackground = true)
+@Composable
+fun InventoryPreview(){
+    MercaAppTheme(dynamicColor = false) {
+        InventoryScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PopUpPreview() {
+    MercaAppTheme(dynamicColor = false) {
+        AddProductDialog(
+            onDismiss = {},
+            onAdd = {}
+        )
+    }
+}
