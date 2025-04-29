@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
+import androidx.navigation.NavController
 import com.example.mercaapp.MainActivity
 import com.example.mercaapp.ui.components.TextInput
 import com.google.firebase.auth.FirebaseAuth
@@ -24,10 +25,10 @@ import com.google.firebase.auth.FirebaseUser
 
 
 @Composable
-fun LoginScreen(context: Context, modifier: Modifier = Modifier) {
+fun LoginScreen( modifier: Modifier = Modifier, navController: NavController? = null) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var user : FirebaseUser
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     Column(
         modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -57,31 +58,40 @@ fun LoginScreen(context: Context, modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.Bold
             )
         )
-        Button(modifier = Modifier.padding(vertical = 24.dp).width(225.dp),
-            onClick = {  user = Login(context, email, password) }) {
+        Button(
+            modifier = Modifier.padding(vertical = 24.dp).width(225.dp),
+            onClick = {
+                Login( email, password) { success, message -> // Llama a Login con el callback
+                    if (success) {
+                        navController?.navigate("home") {
+                            popUpTo("login") { inclusive = true } // Para no volver con "Back"
+                        }
+                    } else {
+                        errorMessage = message // Muestra el error
+                    }
+                }
+            }
+        )
+        {
             Text("Ingresar", style = MaterialTheme.typography.labelSmall)
+        }
+        errorMessage?.let {
+            Text(it, color = MaterialTheme.colorScheme.error)
         }
     }
 }
 
 
-fun Login(context: Context, email: String, password: String): Boolean{
+fun Login( email: String, password: String, onResult: (Boolean, String?) -> Unit) {
     lateinit var auth: FirebaseAuth
     auth = FirebaseAuth.getInstance()
-    if (email.isNotEmpty() && password.isNotEmpty()) {
-        // Llama al método de Firebase para iniciar sesión con email y contraseña
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(context as MainActivity) { task ->
-                if (task.isSuccessful) {
-                    // Inicio de sesión exitoso
-                    val user = auth.currentUser
-                    // Redirige a la siguiente actividad o realiza las acciones necesaria
-                } else {
-
-                }
+    auth.signInWithEmailAndPassword(email, password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                onResult(true, null) // Éxito, no hay error
+            } else {
+                onResult(false, task.exception?.message) // Fallo, pasa el mensaje de error
             }
-    } else {
-        Toast.makeText(context, "Por favor, ingresa email y contraseña.", Toast.LENGTH_SHORT).show()
-    }
+        }
 }
 

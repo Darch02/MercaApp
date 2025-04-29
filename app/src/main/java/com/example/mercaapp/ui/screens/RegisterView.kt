@@ -1,5 +1,6 @@
 package com.example.mercaapp.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -9,10 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.mercaapp.ui.components.TextInput
 
 @Composable
-fun RegisterScreen(modifier: Modifier = Modifier) {
+fun RegisterScreen(modifier: Modifier = Modifier, navController: NavController? = null) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -80,8 +82,13 @@ fun RegisterScreen(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
-                )
-                // Aquí podrías agregar navegación al LoginScreen
+                ),
+                modifier = Modifier.clickable(onClick = {
+                    navController?.navigate("login") {
+                        popUpTo("register") { inclusive = true } // Para no volver con "Back"
+                    }
+                })
+
             )
         }
     }
