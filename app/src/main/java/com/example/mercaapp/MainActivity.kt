@@ -113,3 +113,49 @@ fun ListsDetailViewPreview() {
         ListDetailView()
     }
 }
+
+
+@Preview(showBackground = true)
+@Composable
+fun RegisterScreenPreview(){
+    MercaAppTheme(dynamicColor = false) {
+        RegisterScreen()
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun ForgotPasswordScreenPreview(){
+    MercaAppTheme(dynamicColor = false) {
+        ForgotPasswordScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProfilePreview(){
+    MercaAppTheme(dynamicColor = false) {
+        ProfileScreen()
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun InventoryPreview(){
+    MercaAppTheme(dynamicColor = false) {
+        InventoryScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PopUpPreview() {
+    MercaAppTheme(dynamicColor = false) {
+        AddProductDialog(
+            onDismiss = {},
+            onAdd = {}
+        )
+    }
+}
