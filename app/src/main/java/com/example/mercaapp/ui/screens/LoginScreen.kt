@@ -1,13 +1,12 @@
 package com.example.mercaapp.ui.screens
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,11 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.navigation.NavController
-import com.example.mercaapp.MainActivity
 import com.example.mercaapp.ui.components.TextInput
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 
 
 @Composable
@@ -44,13 +43,20 @@ fun LoginScreen( modifier: Modifier = Modifier, navController: NavController? = 
             modifier = Modifier.padding(vertical = 15.dp).fillMaxWidth(0.8f), // También puedes limitar el ancho aquí
             name = "Email",
             value = email,
-            onValueChange = { email = it }
+            onValueChange = { email = it },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Email
+            )
         )
         TextInput(
             modifier = Modifier.padding(vertical = 15.dp).fillMaxWidth(0.8f),
             name = "Contraseña",
             value = password,
-            onValueChange = { password = it }
+            onValueChange = { password = it },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Password
+            ),
+            visualTransformation = PasswordVisualTransformation()
         )
         Text(
             text = "Olvidé mi contraseña",
@@ -64,7 +70,7 @@ fun LoginScreen( modifier: Modifier = Modifier, navController: NavController? = 
                 Login( email, password) { success, message -> // Llama a Login con el callback
                     if (success) {
                         navController?.navigate("home") {
-                            popUpTo("login") { inclusive = true } // Para no volver con "Back"
+                            popUpTo("onboarding") { inclusive = true } // Para no volver con "Back"
                         }
                     } else {
                         errorMessage = message // Muestra el error
