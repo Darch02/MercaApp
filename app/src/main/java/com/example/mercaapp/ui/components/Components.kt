@@ -49,13 +49,14 @@ fun TextInput(
 }
 
 @Composable
-fun ListCard(modifier: Modifier = Modifier){
+fun ListCard(modifier: Modifier = Modifier, nombreLista: String, cantidadItems: Int, onClick: () -> Unit){
     Card(
         modifier = modifier.fillMaxWidth().padding(vertical = 10.dp),
+        onClick = onClick
     )
     {
-        Text("Lista de mercado", modifier.padding(10.dp), style = MaterialTheme.typography.labelSmall)
-        Text("cantidad de productos: 5", modifier.padding(horizontal = 10.dp, vertical = 5.dp), style = MaterialTheme.typography.bodyLarge )
+        Text(nombreLista, modifier.padding(10.dp), style = MaterialTheme.typography.labelSmall)
+        Text("cantidad de productos: $cantidadItems", modifier.padding(horizontal = 10.dp, vertical = 5.dp), style = MaterialTheme.typography.bodyLarge )
     }
 }
 

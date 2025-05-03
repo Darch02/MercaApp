@@ -135,8 +135,8 @@ fun register( name: String, email: String, password: String, confirmPassword: St
 
     val user = hashMapOf(
         "nombre" to name,
-        "correo" to email,
-        "contraseña" to password)
+        "correo" to email
+    )
 
     if (password != confirmPassword) {
         onResult(false, "Las contraseñas no coinciden")
@@ -149,9 +149,10 @@ fun register( name: String, email: String, password: String, confirmPassword: St
                 // Sign in success, update UI with the signed-in user's information
                 Log.d(TAG, "createUserWithEmail:success")
                 db.collection("usuarios")
-                    .add(user)
-                    .addOnSuccessListener { documentReference ->
-                        Log.d(TAG, "DocumentSnapshot added with ID: ${documentReference.id}")
+                    .document(auth.currentUser!!.uid)
+                    .set(user)
+                    .addOnSuccessListener {
+                        Log.d(TAG, "DocumentSnapshot added with ID: ${auth.currentUser!!.uid}")
                     }
                     .addOnFailureListener { e ->
                         Log.w(TAG, "Error adding document", e)

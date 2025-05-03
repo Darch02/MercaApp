@@ -24,6 +24,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mercaapp.ui.screens.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,17 +42,28 @@ class MainActivity : ComponentActivity() {
                         LoginScreen(navController = navController)
                     }
                     composable("home") {
-                        ListsView() // o la pantalla que quieres mostrar tras login
+                        ListsView(
+                            navController = navController,
+                            user = getCurrentUser()
+                        ) // o la pantalla que quieres mostrar tras login
                     }
                     composable("SignIn") {
                         RegisterScreen(navController = navController)
+                    }
+                    composable("listdetail") {
+                        ListDetailView()
                     }
                 }
             }
         }
     }
+
 }
 
+fun getCurrentUser(): FirebaseUser? {
+    val auth = FirebaseAuth.getInstance()
+    return auth.currentUser
+}
 
 
 @Preview(showBackground = true)

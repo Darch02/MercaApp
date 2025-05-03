@@ -20,14 +20,27 @@ import com.example.mercaapp.ui.components.ListCard
 import com.example.mercaapp.ui.components.BottomNavigationBar
 import com.example.mercaapp.ui.components.TextInput
 import androidx.compose.material3.Button
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavController
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.launch
 
 @Composable
-fun ListsView(modifier: Modifier = Modifier){
+fun ListsView( modifier: Modifier = Modifier, navController: NavController? = null, user: FirebaseUser? = null){
     var showDialog by remember { mutableStateOf(false) }
+    val listsState = remember { mutableStateOf<List<Map<String, Any>>>(emptyList()) }
+    val scope = rememberCoroutineScope()
+    LaunchedEffect(user?.uid) {
+        listsState.value = getLists(user?.uid.toString())
+    }
     Scaffold(
         bottomBar = {
             BottomNavigationBar()
@@ -42,9 +55,15 @@ fun ListsView(modifier: Modifier = Modifier){
                     ),
                     modifier = modifier.fillMaxWidth().padding(vertical = 24.dp)
                 )
-                ListCard()
-                ListCard()
-                ListCard()
+                for (list in listsState.value) {
+                    ListCard(
+                        nombreLista = list["nombre"].toString(),
+                        cantidadItems = list["cantidadItems"].toString().toInt(),
+                        onClick =  {
+                            navController?.navigate("listdetail")
+                        }
+                    )
+                }
                 ExtendedFloatingActionButton(
                     onClick = { showDialog = true },
                     icon = { Icon(Icons.Filled.Edit, "Extended floating action button.") },
@@ -55,7 +74,14 @@ fun ListsView(modifier: Modifier = Modifier){
             if (showDialog) {
                 PopUpNewList(
                     showDialog = showDialog,
-                    onDismiss = { showDialog = false }
+                    onDismiss = { showDialog = false},
+                    userId = user?.uid,
+                    onListCreated = {
+                        scope.launch {
+                            listsState.value = getLists(user?.uid.toString())
+                        }
+                        showDialog = false
+                    }
                 )
             }
         }
@@ -66,9 +92,12 @@ fun ListsView(modifier: Modifier = Modifier){
 fun PopUpNewList(
     showDialog: Boolean,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier)
+    modifier: Modifier = Modifier,
+    userId: String? = null,
+    onListCreated: () -> Unit)
 {
     var nombre by remember { mutableStateOf("") }
+
     AlertDialog(
         modifier = modifier,
         onDismissRequest = onDismiss,
@@ -85,8 +114,15 @@ fun PopUpNewList(
         },
         confirmButton = {
             Button(onClick = {
-                println("Nombre ingresado: $nombre")
-            }) {
+                var uid : String
+                if (userId != null) {
+                    addListToUser(userId, nombre, 0)
+                    onListCreated()
+                } else {
+                    onDismiss()
+                }
+            })
+            {
                 Text("Guardar")
             }
         },
@@ -96,4 +132,38 @@ fun PopUpNewList(
             }
         }
     )
+}
+
+fun addListToUser(userId: String, nombre: String, cantidadItems: Int) {
+
+    val db = FirebaseFirestore.getInstance()
+    val userDocumentRef = db.collection("usuarios").document(userId)
+    val listsCollectionRef = userDocumentRef.collection("lists")
+
+    val newList = hashMapOf(
+        "nombre" to nombre,
+        "cantidadItems" to cantidadItems,
+    )
+
+    listsCollectionRef.add(newList)
+        .addOnSuccessListener { documentReference ->
+            println("lista agregada con ID: ${documentReference.id}")
+        }
+        .addOnFailureListener { e ->
+            println("Error al agregar la orden: $e")
+        }
+}
+
+suspend fun getLists(userId: String): List<Map<String, Any>> {
+    val db = FirebaseFirestore.getInstance()
+    val userDocumentRef = db.collection("usuarios").document(userId)
+    val listsCollectionRef = userDocumentRef.collection("lists")
+
+    return try {
+        val querySnapshot = listsCollectionRef.get().await()
+        querySnapshot.documents.map { it.data ?: emptyMap() }
+    } catch (e: Exception) {
+        println("Error al obtener listas: $e")
+        emptyList()
+    }
 }
