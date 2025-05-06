@@ -43,7 +43,8 @@ fun ListsView( modifier: Modifier = Modifier, navController: NavController? = nu
     }
     Scaffold(
         bottomBar = {
-            BottomNavigationBar()
+            BottomNavigationBar(navController = navController!!)
+
         },
         content = { paddingValues ->
             Column(modifier = modifier.padding(paddingValues).padding(horizontal = 20.dp, vertical = 24.dp)) {

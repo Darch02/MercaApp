@@ -24,18 +24,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.mercaapp.ui.components.TachableListItem
 import com.example.mercaapp.ui.components.BottomNavigationBar
 import com.example.mercaapp.ui.components.TextInput
 
 @Composable
-fun ListDetailView(modifier: Modifier = Modifier){
+fun ListDetailView(modifier: Modifier = Modifier, navController: NavController){
     val initialTasks = listOf("Comprar pan", "Lavar el coche", "Escribir un correo", "Hacer ejercicio")
     val tasks = remember { mutableStateListOf(*initialTasks.toTypedArray()) }
     val taskStates = remember { mutableStateMapOf<String, Boolean>().apply { initialTasks.forEach { this[it] = false } } }
     Scaffold(
         bottomBar = {
-            BottomNavigationBar()
+            BottomNavigationBar(navController = navController!!)
+
         },
         content = { paddingValues ->
             Column(

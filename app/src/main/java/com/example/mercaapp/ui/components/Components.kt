@@ -27,6 +27,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
 fun TextInput(
@@ -87,23 +89,46 @@ fun TachableListItem(text: String, isDone: Boolean, onToggle: (Boolean) -> Unit)
 }
 
 @Composable
-fun BottomNavigationBar(modifier: Modifier = Modifier) {
-    NavigationBar(modifier) {
+fun BottomNavigationBar(navController: NavController) {
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    NavigationBar {
         NavigationBarItem(
-            selected = true,
-            onClick = { /*TODO: Navegar a Inicio*/ },
+            selected = currentRoute == "home",
+            onClick = {
+                if (currentRoute != "home") {
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+            },
             icon = { Icon(Icons.Filled.Menu, contentDescription = "Listas") },
             label = { Text("Listas") }
         )
         NavigationBarItem(
-            selected = false,
-            onClick = { /*TODO: Navegar a Inicio*/ },
+            selected = currentRoute == "inventario",
+            onClick = {
+                if (currentRoute != "inventario") {
+                    navController.navigate("inventario") {
+                        popUpTo("home") { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+            },
             icon = { Icon(Icons.Filled.Home, contentDescription = "Inventario") },
             label = { Text("Inventario") }
         )
         NavigationBarItem(
-            selected = false,
-            onClick = { /*TODO: Navegar a Perfil*/ },
+            selected = currentRoute == "perfil",
+            onClick = {
+                if (currentRoute != "perfil") {
+                    navController.navigate("perfil") {
+                        popUpTo("home") { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+            },
             icon = { Icon(Icons.Filled.Person, contentDescription = "Perfil") },
             label = { Text("Perfil") }
         )

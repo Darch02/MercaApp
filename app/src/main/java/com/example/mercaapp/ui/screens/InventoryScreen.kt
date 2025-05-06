@@ -21,24 +21,27 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.foundation.interaction.MutableInteractionSource
-
-
-
+import androidx.navigation.NavController
 
 
 @Composable
-fun InventoryScreen(modifier: Modifier = Modifier) {
-    // Estado para cada categoría desplegable
+fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController) {
     var alimentosExpanded by remember { mutableStateOf(false) }
-    var limpiezaExpanded by remember { mutableStateOf(true) } // abierta por defecto
+    var limpiezaExpanded by remember { mutableStateOf(true) }
     var mascotasExpanded by remember { mutableStateOf(false) }
     var otrosExpanded by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(navController = navController)
+        }
+    ) { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(bottom = 72.dp), // espacio para la barra
+                .padding(paddingValues)
+                .padding(horizontal = 20.dp, vertical = 24.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
@@ -55,7 +58,6 @@ fun InventoryScreen(modifier: Modifier = Modifier) {
                     .padding(bottom = 24.dp)
             )
 
-            // Sección Alimentos
             ExpandableCategory(
                 title = "Alimentos",
                 icon = Icons.Default.ShoppingCart,
@@ -64,16 +66,14 @@ fun InventoryScreen(modifier: Modifier = Modifier) {
                 products = listOf("Producto 1", "Producto 2")
             )
 
-            // Sección Productos de limpieza
             ExpandableCategory(
                 title = "Productos de limpieza",
                 icon = Icons.Default.Delete,
                 expanded = limpiezaExpanded,
                 onToggle = { limpiezaExpanded = !limpiezaExpanded },
-               products = listOf("Producto", "Producto")
+                products = listOf("Producto", "Producto")
             )
 
-            // Sección Mascotas
             ExpandableCategory(
                 title = "Mascotas",
                 icon = Icons.Default.Favorite,
@@ -82,7 +82,6 @@ fun InventoryScreen(modifier: Modifier = Modifier) {
                 products = listOf()
             )
 
-            // Sección Otros
             ExpandableCategory(
                 title = "Otros",
                 icon = Icons.Default.MoreVert,
@@ -92,10 +91,6 @@ fun InventoryScreen(modifier: Modifier = Modifier) {
             )
 
             Spacer(modifier = Modifier.height(32.dp))
-
-
-            var showDialog by remember { mutableStateOf(false) }
-
 
             Button(
                 onClick = { showDialog = true },
@@ -115,19 +110,7 @@ fun InventoryScreen(modifier: Modifier = Modifier) {
                     }
                 )
             }
-
-
         }
-
-        // Barra inferior
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomCenter
-        ) {
-            BottomNavigationBar()
-        }
-
-
     }
 }
 

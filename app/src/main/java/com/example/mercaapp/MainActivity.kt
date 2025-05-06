@@ -45,15 +45,22 @@ class MainActivity : ComponentActivity() {
                         ListsView(
                             navController = navController,
                             user = getCurrentUser()
-                        ) // o la pantalla que quieres mostrar tras login
+                        )
+                    }
+                    composable("inventario") {
+                        InventoryScreen(navController = navController)
+                    }
+                    composable("perfil") {
+                        ProfileScreen(navController = navController)
                     }
                     composable("SignIn") {
                         RegisterScreen(navController = navController)
                     }
                     composable("listdetail") {
-                        ListDetailView()
+                        ListDetailView(navController = navController)
                     }
                 }
+
             }
         }
     }
@@ -66,6 +73,9 @@ fun getCurrentUser(): FirebaseUser? {
 }
 
 
+
+/*
+ */
 @Preview(showBackground = true)
 @Composable
 fun OnboardingScreenPreview() {
@@ -73,7 +83,7 @@ fun OnboardingScreenPreview() {
        OnboardingScreen()
     }
 }
-
+/*
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
@@ -113,6 +123,10 @@ fun ForgotPasswordScreenPreview(){
         ForgotPasswordScreen()
     }
 }
+/*
+
+
+ */
 
 @Preview(showBackground = true)
 @Composable
@@ -141,3 +155,4 @@ fun PopUpPreview() {
         )
     }
 }
+ */
