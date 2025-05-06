@@ -20,9 +20,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mercaapp.ui.theme.MercaAppTheme
 import androidx.compose.ui.text.style.TextAlign
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.mercaapp.ui.screens.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -56,8 +58,22 @@ class MainActivity : ComponentActivity() {
                     composable("SignIn") {
                         RegisterScreen(navController = navController)
                     }
+<<<<<<< HEAD
                     composable("listdetail") {
                         ListDetailView(navController = navController)
+=======
+                    composable(
+                        route = "listdetail/{listId}/{userId}",
+                        arguments = listOf(
+                            navArgument("listId") { type = NavType.StringType },
+                            navArgument("userId") { type = NavType.StringType })
+                    )
+                    { backStackEntry ->
+                        val listId = backStackEntry.arguments?.getString("listId") ?: ""
+                        val userId = backStackEntry.arguments?.getString("userId") ?: ""
+
+                        ListDetailView(navController = navController, listId = listId, userId = userId)
+>>>>>>> dc89d135ded5d64c7f1c82448b6696fb4b723718
                     }
                 }
 
@@ -102,7 +118,7 @@ fun ListViewPreview() {
 @Composable
 fun ListsDetailViewPreview() {
     MercaAppTheme(dynamicColor = false) {
-        ListDetailView()
+        //ListDetailView()
     }
 }
 
@@ -149,10 +165,10 @@ fun InventoryPreview(){
 @Composable
 fun PopUpPreview() {
     MercaAppTheme(dynamicColor = false) {
-        AddProductDialog(
-            onDismiss = {},
-            onAdd = {}
-        )
+//        AddProductDialog(
+//            onDismiss = {},
+//            onAdd = {}
+//        )
     }
 }
  */

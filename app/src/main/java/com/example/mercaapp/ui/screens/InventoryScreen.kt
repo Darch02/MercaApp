@@ -32,11 +32,20 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
     var otrosExpanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
+<<<<<<< HEAD
     Scaffold(
         bottomBar = {
             BottomNavigationBar(navController = navController)
         }
     ) { paddingValues ->
+=======
+    val nombreProductoState = remember { mutableStateOf("") }
+    val categoriaState = remember { mutableStateOf("") }
+    val cantidadState = remember { mutableStateOf("") }
+    val unidadesState = remember { mutableStateOf("") }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+>>>>>>> dc89d135ded5d64c7f1c82448b6696fb4b723718
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -107,7 +116,11 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
                     onAdd = {
                         // Aquí podrías guardar el producto
                         showDialog = false
-                    }
+                    },
+                    nombreProductoState,
+                    categoriaState,
+                    cantidadState,
+                    unidadesState
                 )
             }
         }
@@ -171,7 +184,14 @@ fun ExpandableCategory(
 }
 
 @Composable
-fun AddProductDialog(onDismiss: () -> Unit, onAdd: () -> Unit) {
+fun AddProductDialog(
+    onDismiss: () -> Unit,
+    onAdd: () -> Unit,
+    nombreProductoState: MutableState<String>,
+    categoriaState: MutableState<String>,
+    cantidadState: MutableState<String>,
+    unidadesState: MutableState<String>
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -206,8 +226,8 @@ fun AddProductDialog(onDismiss: () -> Unit, onAdd: () -> Unit) {
                 )
 
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = nombreProductoState.value,
+                    onValueChange = { nombreProductoState.value = it },
                     label = { Text("Nombre") },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -215,8 +235,8 @@ fun AddProductDialog(onDismiss: () -> Unit, onAdd: () -> Unit) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = {},
+                    value = categoriaState.value,
+                    onValueChange = { categoriaState.value = it },
                     label = { Text("Categoría") },
                     trailingIcon = {
                         Icon(Icons.Default.ArrowDropDown, contentDescription = null)
@@ -231,14 +251,14 @@ fun AddProductDialog(onDismiss: () -> Unit, onAdd: () -> Unit) {
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     OutlinedTextField(
-                        value = "",
-                        onValueChange = {},
+                        value = cantidadState.value,
+                        onValueChange = { cantidadState.value = it },
                         label = { Text("Cantidad") },
                         modifier = Modifier.weight(1f)
                     )
                     OutlinedTextField(
-                        value = "",
-                        onValueChange = {},
+                        value = unidadesState.value,
+                        onValueChange = { unidadesState.value = it },
                         label = { Text("Unidades") },
                         trailingIcon = {
                             Icon(Icons.Default.ArrowDropDown, contentDescription = null)
