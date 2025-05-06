@@ -27,12 +27,25 @@ import androidx.compose.ui.unit.sp
 import com.example.mercaapp.ui.components.TachableListItem
 import com.example.mercaapp.ui.components.BottomNavigationBar
 import com.example.mercaapp.ui.components.TextInput
+import androidx.navigation.NavController
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.launch
+import com.example.mercaapp.ui.screens.AddProductDialog
+import com.google.firebase.firestore.FieldValue
 
 @Composable
-fun ListDetailView(modifier: Modifier = Modifier){
+fun ListDetailView(modifier: Modifier = Modifier, navController: NavController? = null, userId: String, listId: String){
     val initialTasks = listOf("Comprar pan", "Lavar el coche", "Escribir un correo", "Hacer ejercicio")
     val tasks = remember { mutableStateListOf(*initialTasks.toTypedArray()) }
     val taskStates = remember { mutableStateMapOf<String, Boolean>().apply { initialTasks.forEach { this[it] = false } } }
+    var showDialog by remember { mutableStateOf(false) }
+
+    val nombreProductoState = remember { mutableStateOf("") }
+    val categoriaState = remember { mutableStateOf("") }
+    val cantidadState = remember { mutableStateOf("") }
+    val unidadesState = remember { mutableStateOf("") }
     Scaffold(
         bottomBar = {
             BottomNavigationBar()
@@ -59,7 +72,9 @@ fun ListDetailView(modifier: Modifier = Modifier){
                     )
                 }
                 SmallFloatingActionButton (
-                    onClick = { /* Acción al hacer clic */ }){
+                    onClick = {
+                        showDialog = true
+                    }){
                     Row(verticalAlignment = Alignment.CenterVertically,
                         modifier = modifier.padding(horizontal = 10.dp)) {
                         Icon(Icons.Filled.Add, "Agregar")
@@ -67,43 +82,77 @@ fun ListDetailView(modifier: Modifier = Modifier){
                     }
 
                 }
+
+            }
+            if (showDialog) {
+                AddProductDialog(
+                    onDismiss = { showDialog = false },
+                    onAdd = {
+                        addNewItemToList(userId, listId, nombreProductoState.value, cantidadState.value, unidadesState.value, categoriaState.value)
+                        showDialog = false
+                    },
+                    nombreProductoState,
+                    categoriaState,
+                    cantidadState,
+                    unidadesState
+                )
             }
         }
     )
 }
 
-@Composable
-fun PopUpwNeListItem(
-    showDialog: Boolean,
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier)
-{
-    var nombre by remember { mutableStateOf("") }
-    AlertDialog(
-        modifier = modifier,
-        onDismissRequest = onDismiss,
-        title = { Text("Nueva lista") },
-        text = {
-            Column {
-                TextInput(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    name = "nombre",
-                    modifier = modifier
-                )
-            }
-        },
-        confirmButton = {
-            Button(onClick = {
-                println("Nombre ingresado: $nombre")
-            }) {
-                Text("Guardar")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancelar")
-            }
-        }
+
+suspend fun getListItems(userId: String, listId: String) : List<Map<String, Any>>{
+    val db = FirebaseFirestore.getInstance()
+    val userDocumentRef = db.collection("usuarios").document(userId)
+    val listDocumentRef = userDocumentRef.collection("lists").document(listId)
+    val list = mutableListOf<Map<String, Any>>()
+    return try {
+        val documentSnapshot = listDocumentRef.get().await()
+        val items = documentSnapshot?.get("items") as? List<Map<String, Any>> ?: emptyList()
+        items
+    }
+    catch (e: Exception) {
+        println("Error al obtener listas: $e")
+        emptyList()
+    }
+}
+
+fun saveNewListItem(userId: String, listId: String, newItem: Map<String, Any>, onComplete: (Boolean, String?) -> Unit) {
+    val db = FirebaseFirestore.getInstance()
+    val userDocumentRef = db.collection("usuarios").document(userId)
+    val listDocumentRef = userDocumentRef.collection("lists").document(listId)
+
+    val updates = hashMapOf<String, Any>(
+        "items" to FieldValue.arrayUnion(newItem),
+        "cantidadItems" to FieldValue.increment(1) // Incrementa el campo cantidadItems en 1
     )
+
+    listDocumentRef.update(updates)
+        .addOnSuccessListener {
+            println("Item agregado exitosamente a la lista '$listId'.")
+            onComplete(true, null)
+        }
+        .addOnFailureListener { e ->
+            println("Error al agregar el item a la lista '$listId': $e")
+            onComplete(false, e.message)
+        }
+}
+fun addNewItemToList(userId: String, listId: String, itemName: String, itemQuantity: String, itemUnits: String, itemCategory: String) {
+    val newItem = hashMapOf<String, Any>(
+        "nombre" to itemName,
+        "cantidad" to itemQuantity,
+        "unidades" to itemUnits,
+        "categoria" to itemCategory
+    )
+
+    saveNewListItem(userId, listId, newItem) { success, errorMessage ->
+        if (success) {
+            // El item se guardó correctamente
+            println("Nuevo item '$itemName' guardado en la lista.")
+        } else {
+            // Hubo un error al guardar el item
+            println("Error al guardar el item: $errorMessage")
+        }
+    }
 }

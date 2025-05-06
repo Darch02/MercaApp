@@ -60,7 +60,7 @@ fun ListsView( modifier: Modifier = Modifier, navController: NavController? = nu
                         nombreLista = list["nombre"].toString(),
                         cantidadItems = list["cantidadItems"].toString().toInt(),
                         onClick =  {
-                            navController?.navigate("listdetail")
+                            navController?.navigate("listdetail/${list["id"].toString()}/${user?.uid.toString()}")
                         }
                     )
                 }
@@ -158,12 +158,20 @@ suspend fun getLists(userId: String): List<Map<String, Any>> {
     val db = FirebaseFirestore.getInstance()
     val userDocumentRef = db.collection("usuarios").document(userId)
     val listsCollectionRef = userDocumentRef.collection("lists")
-
+    val lists = mutableListOf<Map<String, Any>>()
     return try {
         val querySnapshot = listsCollectionRef.get().await()
-        querySnapshot.documents.map { it.data ?: emptyMap() }
-    } catch (e: Exception) {
-        println("Error al obtener listas: $e")
-        emptyList()
+        for (document in querySnapshot.documents) {
+            document.data?.let { data -> // Usamos let para trabajar con el data no nulo
+                val listData = data.toMutableMap()
+                listData["id"] = document.id // Agrega el ID al Map
+                lists.add(listData)
+            }
+        }
+        lists
+    }
+    catch (e: Exception) {
+    println("Error al obtener listas: $e")
+    emptyList()
     }
 }
