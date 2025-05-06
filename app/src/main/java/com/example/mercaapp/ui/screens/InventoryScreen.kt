@@ -32,84 +32,82 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
     var otrosExpanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
-<<<<<<< HEAD
     Scaffold(
         bottomBar = {
             BottomNavigationBar(navController = navController)
         }
     ) { paddingValues ->
-=======
-    val nombreProductoState = remember { mutableStateOf("") }
-    val categoriaState = remember { mutableStateOf("") }
-    val cantidadState = remember { mutableStateOf("") }
-    val unidadesState = remember { mutableStateOf("") }
+        val nombreProductoState = remember { mutableStateOf("") }
+        val categoriaState = remember { mutableStateOf("") }
+        val cantidadState = remember { mutableStateOf("") }
+        val unidadesState = remember { mutableStateOf("") }
 
-    Box(modifier = Modifier.fillMaxSize()) {
->>>>>>> dc89d135ded5d64c7f1c82448b6696fb4b723718
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 20.dp, vertical = 24.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start
-        ) {
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Text(
-                text = "Inventario",
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 24.dp)
-            )
-
-            ExpandableCategory(
-                title = "Alimentos",
-                icon = Icons.Default.ShoppingCart,
-                expanded = alimentosExpanded,
-                onToggle = { alimentosExpanded = !alimentosExpanded },
-                products = listOf("Producto 1", "Producto 2")
-            )
-
-            ExpandableCategory(
-                title = "Productos de limpieza",
-                icon = Icons.Default.Delete,
-                expanded = limpiezaExpanded,
-                onToggle = { limpiezaExpanded = !limpiezaExpanded },
-                products = listOf("Producto", "Producto")
-            )
-
-            ExpandableCategory(
-                title = "Mascotas",
-                icon = Icons.Default.Favorite,
-                expanded = mascotasExpanded,
-                onToggle = { mascotasExpanded = !mascotasExpanded },
-                products = listOf()
-            )
-
-            ExpandableCategory(
-                title = "Otros",
-                icon = Icons.Default.MoreVert,
-                expanded = otrosExpanded,
-                onToggle = { otrosExpanded = !otrosExpanded },
-                products = listOf()
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(
-                onClick = { showDialog = true },
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 8.dp)
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 20.dp, vertical = 24.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start
             ) {
-                Text("+ Agregar productos al inventario")
-            }
+                Spacer(modifier = Modifier.height(32.dp))
 
+                Text(
+                    text = "Inventario",
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 24.dp)
+                )
+
+                ExpandableCategory(
+                    title = "Alimentos",
+                    icon = Icons.Default.ShoppingCart,
+                    expanded = alimentosExpanded,
+                    onToggle = { alimentosExpanded = !alimentosExpanded },
+                    products = listOf("Producto 1", "Producto 2")
+                )
+
+                ExpandableCategory(
+                    title = "Productos de limpieza",
+                    icon = Icons.Default.Delete,
+                    expanded = limpiezaExpanded,
+                    onToggle = { limpiezaExpanded = !limpiezaExpanded },
+                    products = listOf("Producto", "Producto")
+                )
+
+                ExpandableCategory(
+                    title = "Mascotas",
+                    icon = Icons.Default.Favorite,
+                    expanded = mascotasExpanded,
+                    onToggle = { mascotasExpanded = !mascotasExpanded },
+                    products = listOf()
+                )
+
+                ExpandableCategory(
+                    title = "Otros",
+                    icon = Icons.Default.MoreVert,
+                    expanded = otrosExpanded,
+                    onToggle = { otrosExpanded = !otrosExpanded },
+                    products = listOf()
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Button(
+                    onClick = { showDialog = true },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(vertical = 8.dp)
+                ) {
+                    Text("+ Agregar productos al inventario")
+                }
+
+            }
             if (showDialog) {
                 AddProductDialog(
                     onDismiss = { showDialog = false },

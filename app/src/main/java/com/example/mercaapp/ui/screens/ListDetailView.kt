@@ -13,11 +13,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +30,6 @@ import androidx.navigation.NavController
 import com.example.mercaapp.ui.components.TachableListItem
 import com.example.mercaapp.ui.components.BottomNavigationBar
 import com.example.mercaapp.ui.components.TextInput
-import androidx.navigation.NavController
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
@@ -37,15 +38,36 @@ import com.example.mercaapp.ui.screens.AddProductDialog
 import com.google.firebase.firestore.FieldValue
 
 @Composable
-<<<<<<< HEAD
-fun ListDetailView(modifier: Modifier = Modifier, navController: NavController){
-=======
+
 fun ListDetailView(modifier: Modifier = Modifier, navController: NavController? = null, userId: String, listId: String){
->>>>>>> dc89d135ded5d64c7f1c82448b6696fb4b723718
-    val initialTasks = listOf("Comprar pan", "Lavar el coche", "Escribir un correo", "Hacer ejercicio")
-    val tasks = remember { mutableStateListOf(*initialTasks.toTypedArray()) }
-    val taskStates = remember { mutableStateMapOf<String, Boolean>().apply { initialTasks.forEach { this[it] = false } } }
+
+    val tasks = remember { mutableStateListOf<Map<String, Any>>() }
+    val taskStates = remember { mutableStateMapOf<String, Boolean>() }
     var showDialog by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+
+    // Cargar los items (tareas) al iniciar o cuando userId o listId cambian
+    LaunchedEffect(userId, listId) {
+        val items = getListItems(userId, listId)
+        tasks.addAll(items)
+        taskStates.apply {
+            items.forEach { item -> this[item["nombre"].toString()] = false } // Inicializa el estado como no hecho
+        }
+    }
+
+    // Callback para recargar la lista de items (tareas)
+    val refreshListItems = {
+        scope.launch {
+            val items = getListItems(userId, listId)
+            tasks.clear()
+            tasks.addAll(items)
+            taskStates.clear()
+            taskStates.apply {
+                items.forEach { item -> this[item["nombre"].toString()] = false }
+            }
+        }
+    }
 
     val nombreProductoState = remember { mutableStateOf("") }
     val categoriaState = remember { mutableStateOf("") }
@@ -70,12 +92,16 @@ fun ListDetailView(modifier: Modifier = Modifier, navController: NavController? 
                         fontSize = 40.sp
                     )
                 )
-                tasks.forEach { task ->
-                    TachableListItem(
-                        text = task,
-                        isDone = taskStates[task] ?: false,
-                        onToggle = { isChecked -> taskStates[task] = isChecked }
-                    )
+                if (tasks.isNotEmpty()) {
+                    tasks.forEach { task ->
+                        TachableListItem(
+                            text = task["nombre"].toString(),
+                            isDone = taskStates[task["nombre"].toString()] ?: false,
+                            onToggle = { isChecked -> taskStates[task["nombre"].toString()] = isChecked }
+                        )
+                    }
+                } else {
+                    Text("No hay tareas en esta lista.")
                 }
                 SmallFloatingActionButton (
                     onClick = {
@@ -96,6 +122,7 @@ fun ListDetailView(modifier: Modifier = Modifier, navController: NavController? 
                     onAdd = {
                         addNewItemToList(userId, listId, nombreProductoState.value, cantidadState.value, unidadesState.value, categoriaState.value)
                         showDialog = false
+                        refreshListItems()
                     },
                     nombreProductoState,
                     categoriaState,

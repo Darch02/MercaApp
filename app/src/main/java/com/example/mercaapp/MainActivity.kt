@@ -58,10 +58,6 @@ class MainActivity : ComponentActivity() {
                     composable("SignIn") {
                         RegisterScreen(navController = navController)
                     }
-<<<<<<< HEAD
-                    composable("listdetail") {
-                        ListDetailView(navController = navController)
-=======
                     composable(
                         route = "listdetail/{listId}/{userId}",
                         arguments = listOf(
@@ -73,7 +69,7 @@ class MainActivity : ComponentActivity() {
                         val userId = backStackEntry.arguments?.getString("userId") ?: ""
 
                         ListDetailView(navController = navController, listId = listId, userId = userId)
->>>>>>> dc89d135ded5d64c7f1c82448b6696fb4b723718
+
                     }
                 }
 
