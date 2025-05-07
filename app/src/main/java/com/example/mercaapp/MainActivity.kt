@@ -59,16 +59,20 @@ class MainActivity : ComponentActivity() {
                         RegisterScreen(navController = navController)
                     }
                     composable(
-                        route = "listdetail/{listId}/{userId}",
+                        route = "listdetail/{listId}/{userId}/{listName}",
                         arguments = listOf(
                             navArgument("listId") { type = NavType.StringType },
-                            navArgument("userId") { type = NavType.StringType })
+                            navArgument("userId") { type = NavType.StringType },
+                            navArgument("listName") { type = NavType.StringType }
+                        )
                     )
                     { backStackEntry ->
                         val listId = backStackEntry.arguments?.getString("listId") ?: ""
                         val userId = backStackEntry.arguments?.getString("userId") ?: ""
+                        val listName = backStackEntry.arguments?.getString("listName") ?: ""
 
-                        ListDetailView(navController = navController, listId = listId, userId = userId)
+                        ListDetailView(navController = navController, listId = listId, userId = userId, listName = listName)
+
                     }
                 }
 
@@ -86,7 +90,7 @@ fun getCurrentUser(): FirebaseUser? {
 
 
 /*
-
+ */
 @Preview(showBackground = true)
 @Composable
 fun OnboardingScreenPreview() {
@@ -94,7 +98,6 @@ fun OnboardingScreenPreview() {
        OnboardingScreen()
     }
 }
-    */
 /*
 @Preview(showBackground = true)
 @Composable

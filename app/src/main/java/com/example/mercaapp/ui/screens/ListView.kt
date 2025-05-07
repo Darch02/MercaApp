@@ -61,7 +61,7 @@ fun ListsView( modifier: Modifier = Modifier, navController: NavController? = nu
                         nombreLista = list["nombre"].toString(),
                         cantidadItems = list["cantidadItems"].toString().toInt(),
                         onClick =  {
-                            navController?.navigate("listdetail/${list["id"].toString()}/${user?.uid.toString()}")
+                            navController?.navigate("listdetail/${list["id"].toString()}/${user?.uid.toString()}/${list["nombre"].toString()}")
                         }
                     )
                 }

@@ -32,88 +32,87 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
     var otrosExpanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
-    // Nuevas variables para el popup
-    val nombreProductoState = remember { mutableStateOf("") }
-    val categoriaState = remember { mutableStateOf("") }
-    val cantidadState = remember { mutableStateOf("") }
-    val unidadesState = remember { mutableStateOf("") }
-
     Scaffold(
         bottomBar = {
             BottomNavigationBar(navController = navController)
         }
     ) { paddingValues ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 20.dp, vertical = 24.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start
-        ) {
-            Spacer(modifier = Modifier.height(32.dp))
+        val nombreProductoState = remember { mutableStateOf("") }
+        val categoriaState = remember { mutableStateOf("") }
+        val cantidadState = remember { mutableStateOf("") }
+        val unidadesState = remember { mutableStateOf("") }
 
-            Text(
-                text = "Inventario",
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 24.dp)
-            )
-
-            // Categorías desplegables
-            ExpandableCategory(
-                title = "Alimentos",
-                icon = Icons.Default.ShoppingCart,
-                expanded = alimentosExpanded,
-                onToggle = { alimentosExpanded = !alimentosExpanded },
-                products = listOf("Producto 1", "Producto 2")
-            )
-
-            ExpandableCategory(
-                title = "Productos de limpieza",
-                icon = Icons.Default.Delete,
-                expanded = limpiezaExpanded,
-                onToggle = { limpiezaExpanded = !limpiezaExpanded },
-                products = listOf("Producto", "Producto")
-            )
-
-            ExpandableCategory(
-                title = "Mascotas",
-                icon = Icons.Default.Favorite,
-                expanded = mascotasExpanded,
-                onToggle = { mascotasExpanded = !mascotasExpanded },
-                products = listOf()
-            )
-
-            ExpandableCategory(
-                title = "Otros",
-                icon = Icons.Default.MoreVert,
-                expanded = otrosExpanded,
-                onToggle = { otrosExpanded = !otrosExpanded },
-                products = listOf()
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Botón para mostrar el popup
-            Button(
-                onClick = { showDialog = true },
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 8.dp)
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(horizontal = 20.dp, vertical = 24.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start
             ) {
-                Text("+ Agregar productos al inventario")
-            }
+                Spacer(modifier = Modifier.height(32.dp))
 
+                Text(
+                    text = "Inventario",
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 24.dp)
+                )
+
+                ExpandableCategory(
+                    title = "Alimentos",
+                    icon = Icons.Default.ShoppingCart,
+                    expanded = alimentosExpanded,
+                    onToggle = { alimentosExpanded = !alimentosExpanded },
+                    products = listOf("Producto 1", "Producto 2")
+                )
+
+                ExpandableCategory(
+                    title = "Productos de limpieza",
+                    icon = Icons.Default.Delete,
+                    expanded = limpiezaExpanded,
+                    onToggle = { limpiezaExpanded = !limpiezaExpanded },
+                    products = listOf("Producto", "Producto")
+                )
+
+                ExpandableCategory(
+                    title = "Mascotas",
+                    icon = Icons.Default.Favorite,
+                    expanded = mascotasExpanded,
+                    onToggle = { mascotasExpanded = !mascotasExpanded },
+                    products = listOf()
+                )
+
+                ExpandableCategory(
+                    title = "Otros",
+                    icon = Icons.Default.MoreVert,
+                    expanded = otrosExpanded,
+                    onToggle = { otrosExpanded = !otrosExpanded },
+                    products = listOf()
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Button(
+                    onClick = { showDialog = true },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(vertical = 8.dp)
+                ) {
+                    Text("+ Agregar productos al inventario")
+                }
+
+            }
             if (showDialog) {
                 AddProductDialog(
                     onDismiss = { showDialog = false },
                     onAdd = {
-                        // Aquí podrías guardar los valores actuales
+                        // Aquí podrías guardar el producto
                         showDialog = false
                     },
                     nombreProductoState,
@@ -125,7 +124,6 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
         }
     }
 }
-
 
 @Composable
 fun ExpandableCategory(
@@ -192,6 +190,8 @@ fun AddProductDialog(
     cantidadState: MutableState<String>,
     unidadesState: MutableState<String>
 ) {
+    var expanded by remember { mutableStateOf(false) }
+    val categories = listOf("Alimentos", "Productos de Aseo", "Mascotas", "Otros")
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -202,14 +202,16 @@ fun AddProductDialog(
             ) {
                 onDismiss()
             }
-    ) {
+    )
+    {
         Card(
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(24.dp)
                 .fillMaxWidth(0.85f),
             shape = RoundedCornerShape(20.dp)
-        ) {
+        )
+        {
             Column(
                 modifier = Modifier
                     .padding(24.dp)
@@ -234,16 +236,35 @@ fun AddProductDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
-                    value = categoriaState.value,
-                    onValueChange = { categoriaState.value = it },
-                    label = { Text("Categoría") },
-                    trailingIcon = {
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
+                Box {
+                    OutlinedTextField(
+                        value = categoriaState.value,
+                        onValueChange = { /* No permitir edición directa */ },
+                        label = { Text("Categoría") },
+                        trailingIcon = {
+                            Icon(
+                                Icons.Default.ArrowDropDown, contentDescription = null,
+                                Modifier.clickable { expanded = !expanded })
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        readOnly = true // Evita la edición directa
+                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        categories.forEach { category ->
+                            DropdownMenuItem(
+                                text = { Text(category) },
+                                onClick = {
+                                    categoriaState.value = category
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
