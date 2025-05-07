@@ -190,6 +190,8 @@ fun AddProductDialog(
     cantidadState: MutableState<String>,
     unidadesState: MutableState<String>
 ) {
+    var expanded by remember { mutableStateOf(false) }
+    val categories = listOf("Alimentos", "Productos de Aseo", "Mascotas", "Otros")
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -200,14 +202,16 @@ fun AddProductDialog(
             ) {
                 onDismiss()
             }
-    ) {
+    )
+    {
         Card(
             modifier = Modifier
                 .align(Alignment.Center)
                 .padding(24.dp)
                 .fillMaxWidth(0.85f),
             shape = RoundedCornerShape(20.dp)
-        ) {
+        )
+        {
             Column(
                 modifier = Modifier
                     .padding(24.dp)
@@ -232,16 +236,35 @@ fun AddProductDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
-                    value = categoriaState.value,
-                    onValueChange = { categoriaState.value = it },
-                    label = { Text("Categoría") },
-                    trailingIcon = {
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
+                Box {
+                    OutlinedTextField(
+                        value = categoriaState.value,
+                        onValueChange = { /* No permitir edición directa */ },
+                        label = { Text("Categoría") },
+                        trailingIcon = {
+                            Icon(
+                                Icons.Default.ArrowDropDown, contentDescription = null,
+                                Modifier.clickable { expanded = !expanded })
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        readOnly = true // Evita la edición directa
+                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        categories.forEach { category ->
+                            DropdownMenuItem(
+                                text = { Text(category) },
+                                onClick = {
+                                    categoriaState.value = category
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
