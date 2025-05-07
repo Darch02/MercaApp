@@ -32,20 +32,17 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
     var otrosExpanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
-<<<<<<< HEAD
-    Scaffold(
-        bottomBar = {
-            BottomNavigationBar(navController = navController)
-        }
-    ) { paddingValues ->
-=======
+    // Nuevas variables para el popup
     val nombreProductoState = remember { mutableStateOf("") }
     val categoriaState = remember { mutableStateOf("") }
     val cantidadState = remember { mutableStateOf("") }
     val unidadesState = remember { mutableStateOf("") }
 
-    Box(modifier = Modifier.fillMaxSize()) {
->>>>>>> dc89d135ded5d64c7f1c82448b6696fb4b723718
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(navController = navController)
+        }
+    ) { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -67,6 +64,7 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
                     .padding(bottom = 24.dp)
             )
 
+            // Categorías desplegables
             ExpandableCategory(
                 title = "Alimentos",
                 icon = Icons.Default.ShoppingCart,
@@ -101,6 +99,7 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            // Botón para mostrar el popup
             Button(
                 onClick = { showDialog = true },
                 modifier = Modifier
@@ -114,7 +113,7 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
                 AddProductDialog(
                     onDismiss = { showDialog = false },
                     onAdd = {
-                        // Aquí podrías guardar el producto
+                        // Aquí podrías guardar los valores actuales
                         showDialog = false
                     },
                     nombreProductoState,
@@ -126,6 +125,7 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
         }
     }
 }
+
 
 @Composable
 fun ExpandableCategory(

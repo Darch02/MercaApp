@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.mercaapp.ui.components.TachableListItem
 import com.example.mercaapp.ui.components.BottomNavigationBar
 import com.example.mercaapp.ui.components.TextInput
@@ -37,11 +36,7 @@ import com.example.mercaapp.ui.screens.AddProductDialog
 import com.google.firebase.firestore.FieldValue
 
 @Composable
-<<<<<<< HEAD
-fun ListDetailView(modifier: Modifier = Modifier, navController: NavController){
-=======
 fun ListDetailView(modifier: Modifier = Modifier, navController: NavController? = null, userId: String, listId: String){
->>>>>>> dc89d135ded5d64c7f1c82448b6696fb4b723718
     val initialTasks = listOf("Comprar pan", "Lavar el coche", "Escribir un correo", "Hacer ejercicio")
     val tasks = remember { mutableStateListOf(*initialTasks.toTypedArray()) }
     val taskStates = remember { mutableStateMapOf<String, Boolean>().apply { initialTasks.forEach { this[it] = false } } }
