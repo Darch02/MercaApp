@@ -1,12 +1,17 @@
 package com.example.mercaapp.ui.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -46,22 +51,23 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 
 @Composable
-
-fun ListDetailView(modifier: Modifier = Modifier, navController: NavController? = null, userId: String, listId: String, listName: String){
-
+fun ListDetailView(
+    modifier: Modifier = Modifier,
+    navController: NavController? = null,
+    userId: String,
+    listId: String,
+    listName: String
+) {
     val tasks = remember { mutableStateListOf<Map<String, Any>>() }
     var showDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
-
     val scope = rememberCoroutineScope()
 
-    // Cargar los items (tareas) al iniciar o cuando userId o listId cambian
     LaunchedEffect(userId, listId) {
         val items = getListItems(userId, listId)
         tasks.addAll(items)
     }
 
-    // Callback para recargar la lista de items (tareas)
     val refreshListItems = {
         scope.launch {
             val items = getListItems(userId, listId)
@@ -73,7 +79,6 @@ fun ListDetailView(modifier: Modifier = Modifier, navController: NavController? 
     val updateItemState = { itemName: String, isChecked: Boolean ->
         scope.launch {
             updateListItemState(userId, listId, itemName, isChecked)
-            // Recargar la lista para reflejar los cambios
             val updatedItems = getListItems(userId, listId)
             tasks.clear()
             tasks.addAll(updatedItems)
@@ -84,21 +89,27 @@ fun ListDetailView(modifier: Modifier = Modifier, navController: NavController? 
     val categoriaState = remember { mutableStateOf("") }
     val cantidadState = remember { mutableStateOf("") }
     val unidadesState = remember { mutableStateOf("") }
+    var mensaje by remember { mutableStateOf<String?>(null) }
+
     Scaffold(
         bottomBar = {
             BottomNavigationBar(navController = navController!!)
-
         },
         content = { paddingValues ->
+            val scrollState = rememberScrollState()
+
             Box(
                 modifier = modifier
-                    .fillMaxSize() // O ajusta la altura según necesites
+                    .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(horizontal = 20.dp, vertical = 24.dp),
-                contentAlignment = Alignment.BottomEnd // Alinea el FAB a la esquina inferior derecha inicialmente
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth() // O ajusta el ancho según necesites
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 20.dp, vertical = 24.dp)
+                        .verticalScroll(scrollState),
+                    verticalArrangement = Arrangement.Top,
+                    horizontalAlignment = Alignment.Start
                 ) {
                     Text(
                         text = listName,
@@ -108,27 +119,30 @@ fun ListDetailView(modifier: Modifier = Modifier, navController: NavController? 
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
+
                     if (tasks.isNotEmpty()) {
                         tasks.forEach { task ->
                             TachableListItem(
-                                text = task["nombre"].toString() + " " + task["cantidad"].toString() + " " + task["unidades"].toString(),
+                                text = "${task["nombre"]} ${task["cantidad"]} ${task["unidades"]}",
                                 isDone = task["estado"] as? Boolean ?: false,
                                 onToggle = { isChecked ->
-                                    // Actualizar el estado local inmediatamente para la UI
                                     val index = tasks.indexOf(task)
                                     val updatedTask = task.toMutableMap()
                                     updatedTask["estado"] = isChecked
                                     tasks[index] = updatedTask.toMap()
-                                    // Guardar el estado en la base de datos
                                     updateItemState(task["nombre"].toString(), isChecked)
                                 }
                             )
                         }
                     } else {
-                        Text("No hay items en esta lista.")
+                        Text(
+                            "No hay items en esta lista.",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 32.dp),
+                            textAlign = TextAlign.Center
+                        )
                     }
-
-                    var mensaje by remember { mutableStateOf<String?>(null) }
 
                     Button(
                         onClick = {
@@ -155,62 +169,74 @@ fun ListDetailView(modifier: Modifier = Modifier, navController: NavController? 
                                 }
                             }
                         },
-                        modifier = modifier.padding(vertical = 20.dp)
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(vertical = 20.dp)
                     ) {
                         Text("enviar productos seleccionados al inventario")
                     }
 
                     mensaje?.let {
+                        LaunchedEffect(it) {
+                            kotlinx.coroutines.delay(3000)
+                            mensaje = null
+                        }
                         Text(
                             text = it,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary,
-                            modifier = modifier.padding(top = 8.dp)
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(top = 8.dp)
                         )
                     }
 
+                    Spacer(modifier = Modifier.height(100.dp))
+                }
 
-                    Spacer(modifier = Modifier.weight(1f)) // Empuja el FAB hacia abajo
-                }
-                SmallFloatingActionButton(
-                    onClick = {
-                        showDialog = true
-                    },
+                Row(
                     modifier = Modifier
-                        .padding(16.dp)
-                        .align(Alignment.BottomStart) // Asegura que el FAB esté en la esquina inferior derecha
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = modifier.padding(horizontal = 10.dp)
-                    ) {
-                        Icon(Icons.Filled.Add, "Agregar")
-                        Text("Agregar", style = MaterialTheme.typography.labelSmall)
+                    SmallFloatingActionButton(onClick = { showDialog = true }) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 10.dp)
+                        ) {
+                            Icon(Icons.Filled.Add, contentDescription = "Agregar")
+                            Text("Agregar", style = MaterialTheme.typography.labelSmall)
+                        }
                     }
-                }
-                SmallFloatingActionButton(
-                    onClick = {
-                        showDeleteDialog = true
-                    },
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .align(Alignment.BottomEnd),
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = modifier.padding(horizontal = 10.dp)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    SmallFloatingActionButton(
+                        onClick = { showDeleteDialog = true },
+                        containerColor = MaterialTheme.colorScheme.errorContainer
                     ) {
-                        Icon(Icons.Filled.Delete, "Agregar")
-                        Text("eliminar lista", style = MaterialTheme.typography.labelSmall)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 10.dp)
+                        ) {
+                            Icon(Icons.Filled.Delete, contentDescription = "Eliminar")
+                            Text("eliminar lista", style = MaterialTheme.typography.labelSmall)
+                        }
                     }
                 }
             }
+
             if (showDialog) {
                 AddProductDialog(
                     onDismiss = { showDialog = false },
                     onAdd = {
-                        addNewItemToList(userId, listId, nombreProductoState.value, cantidadState.value, unidadesState.value, categoriaState.value)
+                        addNewItemToList(
+                            userId,
+                            listId,
+                            nombreProductoState.value,
+                            cantidadState.value,
+                            unidadesState.value,
+                            categoriaState.value
+                        )
                         showDialog = false
                         refreshListItems()
                     },
@@ -220,7 +246,8 @@ fun ListDetailView(modifier: Modifier = Modifier, navController: NavController? 
                     unidadesState
                 )
             }
-            if(showDeleteDialog) {
+
+            if (showDeleteDialog) {
                 PopUpConfirmDelete(
                     showDialog = showDeleteDialog,
                     onDismiss = { showDeleteDialog = false },
@@ -229,10 +256,8 @@ fun ListDetailView(modifier: Modifier = Modifier, navController: NavController? 
                             if (success) {
                                 println("Lista eliminada correctamente.")
                                 navController?.navigate("home")
-                                // Aquí podrías realizar alguna acción adicional después de la eliminación
                             } else {
                                 println("Error al eliminar la lista: $errorMessage")
-                                // Aquí podrías manejar el error, mostrar un mensaje al usuario, etc.
                             }
                         }
                     },

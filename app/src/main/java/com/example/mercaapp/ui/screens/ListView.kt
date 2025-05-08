@@ -3,6 +3,8 @@ package com.example.mercaapp.ui.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
@@ -47,7 +49,13 @@ fun ListsView( modifier: Modifier = Modifier, navController: NavController? = nu
 
         },
         content = { paddingValues ->
-            Column(modifier = modifier.padding(paddingValues).padding(horizontal = 20.dp, vertical = 24.dp)) {
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = modifier
+                    .padding(paddingValues)
+                    .padding(horizontal = 20.dp, vertical = 24.dp)
+                    .verticalScroll(scrollState), // 👈 Habilita el scroll
+            ) {
                 Text(
                     text = "Listas de mercado",
                     style = MaterialTheme.typography.titleLarge.copy(

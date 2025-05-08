@@ -61,16 +61,19 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
         val categoriaState = remember { mutableStateOf("") }
         val cantidadState = remember { mutableStateOf("") }
         val unidadesState = remember { mutableStateOf("") }
+        val scrollState = rememberScrollState()
+
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(horizontal = 20.dp, vertical = 24.dp),
+                    .padding(horizontal = 20.dp, vertical = 24.dp)
+                    .verticalScroll(scrollState), // ← Este es el cambio clave
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
-            ) {
+            ){
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
@@ -90,7 +93,14 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
                     icon = Icons.Default.ShoppingCart,
                     expanded = alimentosExpanded,
                     onToggle = { alimentosExpanded = !alimentosExpanded },
-                    products = alimentos
+                    products = alimentos,
+                    onDelete = { nombre ->
+                        if (userId != null) {
+                            deleteInventoryItem(userId, nombre) { success, error ->
+                                if (success) reloadTrigger++ else println("Error: $error")
+                            }
+                        }
+                    }
                 )
 
                 val limpieza = productos
@@ -102,7 +112,14 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
                     icon = Icons.Default.Delete,
                     expanded = limpiezaExpanded,
                     onToggle = { limpiezaExpanded = !limpiezaExpanded },
-                    products = limpieza
+                    products = limpieza,
+                    onDelete = { nombre ->
+                        if (userId != null) {
+                            deleteInventoryItem(userId, nombre) { success, error ->
+                                if (success) reloadTrigger++ else println("Error: $error")
+                            }
+                        }
+                    }
                 )
 
 
@@ -115,7 +132,14 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
                     icon = Icons.Default.Favorite,
                     expanded = mascotasExpanded,
                     onToggle = { mascotasExpanded = !mascotasExpanded },
-                    products = mascotas
+                    products = mascotas,
+                    onDelete = { nombre ->
+                        if (userId != null) {
+                            deleteInventoryItem(userId, nombre) { success, error ->
+                                if (success) reloadTrigger++ else println("Error: $error")
+                            }
+                        }
+                    }
                 )
 
 
@@ -128,7 +152,14 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
                     icon = Icons.Default.MoreVert,
                     expanded = otrosExpanded,
                     onToggle = { otrosExpanded = !otrosExpanded },
-                    products = otros
+                    products = otros,
+                    onDelete = { nombre ->
+                        if (userId != null) {
+                            deleteInventoryItem(userId, nombre) { success, error ->
+                                if (success) reloadTrigger++ else println("Error: $error")
+                            }
+                        }
+                    }
                 )
 
 
@@ -183,7 +214,8 @@ fun ExpandableCategory(
     icon: ImageVector,
     expanded: Boolean,
     onToggle: () -> Unit,
-    products: List<String>
+    products: List<String>,
+    onDelete: (String) -> Unit
 ) {
     Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)) {
         Row(
@@ -223,7 +255,7 @@ fun ExpandableCategory(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(text = product)
-                        IconButton(onClick = { /* Acción eliminar */ }) {
+                        IconButton(onClick = { onDelete(product) }) {
                             Icon(Icons.Default.Delete, contentDescription = "Eliminar")
                         }
                     }
@@ -232,6 +264,7 @@ fun ExpandableCategory(
         }
     }
 }
+
 
 @Composable
 fun AddProductDialog(
@@ -266,8 +299,7 @@ fun AddProductDialog(
         {
             Column(
                 modifier = Modifier
-                    .padding(24.dp)
-                    .background(Color.White),
+                    .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -367,4 +399,28 @@ fun saveInventoryItem(
         .addOnSuccessListener { onComplete(true, null) }
         .addOnFailureListener { e -> onComplete(false, e.message) }
 }
+
+fun deleteInventoryItem(
+    userId: String,
+    nombre: String,
+    onComplete: (Boolean, String?) -> Unit
+) {
+    val db = FirebaseFirestore.getInstance()
+    val ref = db.collection("usuarios").document(userId).collection("inventario")
+
+    ref.whereEqualTo("nombre", nombre).get()
+        .addOnSuccessListener { querySnapshot ->
+            val batch = db.batch()
+            for (document in querySnapshot.documents) {
+                batch.delete(document.reference)
+            }
+            batch.commit()
+                .addOnSuccessListener { onComplete(true, null) }
+                .addOnFailureListener { e -> onComplete(false, e.message) }
+        }
+        .addOnFailureListener { e ->
+            onComplete(false, e.message)
+        }
+}
+
 
