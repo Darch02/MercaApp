@@ -22,6 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 
 @Composable
@@ -31,6 +34,23 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
     var mascotasExpanded by remember { mutableStateOf(false) }
     var otrosExpanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
+
+    // 🔄 Recarga de productos al agregar
+    val userId = FirebaseAuth.getInstance().currentUser?.uid
+    var reloadTrigger by remember { mutableStateOf(0) }
+    val productos = remember { mutableStateListOf<Map<String, Any>>() }
+
+    // 🚀 Cargar productos del inventario
+    LaunchedEffect(userId, reloadTrigger) {
+        if (userId != null) {
+            val snapshot = FirebaseFirestore.getInstance()
+                .collection("usuarios").document(userId).collection("inventario")
+                .get().await()
+
+            productos.clear()
+            productos.addAll(snapshot.documents.mapNotNull { it.data })
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -64,37 +84,53 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
                         .padding(bottom = 24.dp)
                 )
 
+                val alimentos = productos.filter { it["categoria"] == "Alimentos" }.map { it["nombre"].toString() }
                 ExpandableCategory(
                     title = "Alimentos",
                     icon = Icons.Default.ShoppingCart,
                     expanded = alimentosExpanded,
                     onToggle = { alimentosExpanded = !alimentosExpanded },
-                    products = listOf("Producto 1", "Producto 2")
+                    products = alimentos
                 )
+
+                val limpieza = productos
+                    .filter { it["categoria"] == "Productos de Aseo" }
+                    .map { it["nombre"].toString() }
 
                 ExpandableCategory(
                     title = "Productos de limpieza",
                     icon = Icons.Default.Delete,
                     expanded = limpiezaExpanded,
                     onToggle = { limpiezaExpanded = !limpiezaExpanded },
-                    products = listOf("Producto", "Producto")
+                    products = limpieza
                 )
+
+
+                val mascotas = productos
+                    .filter { it["categoria"] == "Mascotas" }
+                    .map { it["nombre"].toString() }
 
                 ExpandableCategory(
                     title = "Mascotas",
                     icon = Icons.Default.Favorite,
                     expanded = mascotasExpanded,
                     onToggle = { mascotasExpanded = !mascotasExpanded },
-                    products = listOf()
+                    products = mascotas
                 )
+
+
+                val otros = productos
+                    .filter { it["categoria"] == "Otros" }
+                    .map { it["nombre"].toString() }
 
                 ExpandableCategory(
                     title = "Otros",
                     icon = Icons.Default.MoreVert,
                     expanded = otrosExpanded,
                     onToggle = { otrosExpanded = !otrosExpanded },
-                    products = listOf()
+                    products = otros
                 )
+
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -112,9 +148,25 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
                 AddProductDialog(
                     onDismiss = { showDialog = false },
                     onAdd = {
-                        // Aquí podrías guardar el producto
-                        showDialog = false
-                    },
+                        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@AddProductDialog
+
+                        val newItem = mapOf(
+                            "nombre" to nombreProductoState.value,
+                            "categoria" to categoriaState.value,
+                            "cantidad" to cantidadState.value,
+                            "unidades" to unidadesState.value
+                        )
+
+                        saveInventoryItem(userId, newItem) { success, error ->
+                            if (success) {
+                                showDialog = false
+                                reloadTrigger++ // Esto fuerza recarga de productos en pantalla
+                            } else {
+                                println("Error guardando producto: $error")
+                            }
+                        }
+                    }
+                    ,
                     nombreProductoState,
                     categoriaState,
                     cantidadState,
@@ -302,3 +354,17 @@ fun AddProductDialog(
         }
     }
 }
+
+fun saveInventoryItem(
+    userId: String,
+    item: Map<String, Any>,
+    onComplete: (Boolean, String?) -> Unit
+) {
+    val db = FirebaseFirestore.getInstance()
+    val ref = db.collection("usuarios").document(userId).collection("inventario")
+
+    ref.add(item)
+        .addOnSuccessListener { onComplete(true, null) }
+        .addOnFailureListener { e -> onComplete(false, e.message) }
+}
+
