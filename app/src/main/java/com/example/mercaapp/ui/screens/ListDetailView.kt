@@ -42,6 +42,7 @@ import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.launch
 import com.example.mercaapp.ui.screens.AddProductDialog
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 
 @Composable
@@ -127,9 +128,48 @@ fun ListDetailView(modifier: Modifier = Modifier, navController: NavController? 
                         Text("No hay items en esta lista.")
                     }
 
-                    Button(onClick = {}, modifier = modifier.padding(vertical = 20.dp)) {
+                    var mensaje by remember { mutableStateOf<String?>(null) }
+
+                    Button(
+                        onClick = {
+                            val user = FirebaseAuth.getInstance().currentUser
+                            if (user != null) {
+                                val productosTachados = tasks.filter { (it["estado"] as? Boolean) == true }
+                                if (productosTachados.isEmpty()) {
+                                    mensaje = "No tienes productos seleccionados"
+                                } else {
+                                    for (producto in productosTachados) {
+                                        val item = mapOf(
+                                            "nombre" to producto["nombre"].toString(),
+                                            "categoria" to producto["categoria"].toString(),
+                                            "cantidad" to producto["cantidad"].toString(),
+                                            "unidades" to producto["unidades"].toString()
+                                        )
+                                        saveInventoryItem(user.uid, item) { success, error ->
+                                            if (!success) {
+                                                println("Error al enviar producto '${item["nombre"]}' al inventario: $error")
+                                            }
+                                        }
+                                    }
+                                    mensaje = "Productos enviados correctamente"
+                                }
+                            }
+                        },
+                        modifier = modifier.padding(vertical = 20.dp)
+                    ) {
                         Text("enviar productos seleccionados al inventario")
                     }
+
+                    mensaje?.let {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = modifier.padding(top = 8.dp)
+                        )
+                    }
+
+
                     Spacer(modifier = Modifier.weight(1f)) // Empuja el FAB hacia abajo
                 }
                 SmallFloatingActionButton(
