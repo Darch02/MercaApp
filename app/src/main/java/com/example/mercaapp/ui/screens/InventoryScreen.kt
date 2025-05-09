@@ -108,7 +108,7 @@ fun InventoryScreen(modifier: Modifier = Modifier, navController: NavController)
                     .map { it["nombre"].toString() }
 
                 ExpandableCategory(
-                    title = "Productos de limpieza",
+                    title = "Productos de Aseo",
                     icon = Icons.Default.Delete,
                     expanded = limpiezaExpanded,
                     onToggle = { limpiezaExpanded = !limpiezaExpanded },
