@@ -1,4 +1,4 @@
-package com.example.mercaapp
+package com.appmoviles.mercaapp
 
 import org.junit.Test
 

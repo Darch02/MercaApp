@@ -1,8 +1,7 @@
-package com.example.mercaapp.ui.components
+package com.appmoviles.mercaapp.ui.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,20 +22,14 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.mercaapp.ui.screens.addListToUser
 
 @Composable
 fun TextInput(
@@ -90,7 +83,7 @@ fun TachableListItem(text: String, isDone: Boolean, onToggle: (Boolean) -> Unit)
                 textDecoration = if (isDone) TextDecoration.LineThrough else TextDecoration.None,
                 fontSize = 20.sp
             ),
-            color = if (isDone) Color.Gray else Color.Black,
+            color = if (isDone) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f) // Para que el texto ocupe la mayor parte del espacio
         )
     }

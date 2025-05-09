@@ -1,4 +1,4 @@
-package com.example.mercaapp.ui.screens
+package com.appmoviles.mercaapp.ui.screens
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -14,7 +14,7 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.MoreVert
-import com.example.mercaapp.ui.components.BottomNavigationBar
+import com.appmoviles.mercaapp.ui.components.BottomNavigationBar
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.ArrowForward
 

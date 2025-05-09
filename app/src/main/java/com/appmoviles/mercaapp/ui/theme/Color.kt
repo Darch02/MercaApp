@@ -1,4 +1,4 @@
-package com.example.mercaapp.ui.theme
+package com.appmoviles.mercaapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

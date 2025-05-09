@@ -1,4 +1,4 @@
-package com.example.mercaapp.ui.screens
+package com.appmoviles.mercaapp.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,9 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.unit.sp
-import com.example.mercaapp.ui.components.ListCard
-import com.example.mercaapp.ui.components.BottomNavigationBar
-import com.example.mercaapp.ui.components.TextInput
+import com.appmoviles.mercaapp.ui.components.ListCard
+import com.appmoviles.mercaapp.ui.components.BottomNavigationBar
+import com.appmoviles.mercaapp.ui.components.TextInput
 import androidx.compose.material3.Button
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,7 +30,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.launch

@@ -1,4 +1,4 @@
-package com.example.mercaapp.ui.theme
+package com.appmoviles.mercaapp.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.Font
-import com.example.mercaapp.R
+import com.appmoviles.mercaapp.R
 
 // Set of Material typography styles to start with
 val MyFont = FontFamily(
